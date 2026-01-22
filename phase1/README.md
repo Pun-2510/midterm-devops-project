@@ -61,3 +61,14 @@ The repository is organized according to a phase-based structure, ensuring clari
 ├── .gitignore
 ├── package.json
 └── package-lock.json
+```
+
+# V. Local Development Setup
+**Prerequisites**
+> Before running the application locally, ensure that the following software is installed:
+> Node.js (at least or higher than 18)
+> npm
+> MongoDB
+
+**Installation**
+
