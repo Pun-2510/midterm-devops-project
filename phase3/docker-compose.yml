@@ -1,23 +1,21 @@
 volumes:
   mongo_data:
-  uploads:
 
 services:
   app:
-    build: 
-      context: .. # Path to directory containing source code due to multi-phase setup
-      dockerfile: phase3/Dockerfile
+    image: pun0205/midterm-devops-app:phase3 
     container_name: app
     ports:
       - "3000:3000"
     env_file:
       - ../.env
     volumes:
-      - type: volume
-        source: uploads
+      - type: bind
+        source: /opt/app/uploads
         target: /app/uploads
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
     restart: unless-stopped
 
   mongo:
@@ -27,4 +25,9 @@ services:
       - type: volume
         source: mongo_data
         target: /data/db
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
