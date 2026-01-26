@@ -5,8 +5,8 @@ volumes:
 services:
   app:
     build: 
-      - context: .. # Path to directory containing source code due to multi-phase setup
-      - dockerfile: phase3/Dockerfile
+      context: .. # Path to directory containing source code due to multi-phase setup
+      dockerfile: phase3/Dockerfile
     container_name: app
     ports:
       - "3000:3000"
