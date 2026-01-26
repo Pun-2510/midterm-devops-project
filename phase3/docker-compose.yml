@@ -1,0 +1,30 @@
+volumes:
+  mongo_data:
+  uploads:
+
+services:
+  app:
+    build: 
+      - context: .. # Path to directory containing source code due to multi-phase setup
+      - dockerfile: phase3/Dockerfile
+    container_name: app
+    ports:
+      - "3000:3000"
+    env_file:
+      - ../.env
+    volumes:
+      - type: volume
+        source: uploads
+        target: /app/uploads
+    depends_on:
+      - mongo
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:6
+    container_name: mongo
+    volumes:
+      - type: volume
+        source: mongo_data
+        target: /data/db
+    restart: unless-stopped
