@@ -1,7 +1,4 @@
 node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
 .env
 .env.*
@@ -12,9 +9,6 @@ dist/
 build/
 coverage/
 
-logs/
-*.log
-
 uploads/
 public/uploads/
 
@@ -24,12 +18,3 @@ mongo-data/
 
 docker-data/
 docker-volumes/
-*.pid
-
-.DS_Store
-Thumbs.db
-.vscode/
-.idea/
-
-phase*/tmp/
-phase*/drafts/

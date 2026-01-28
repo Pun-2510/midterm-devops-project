@@ -23,8 +23,8 @@ app.use('/products', productRoutes);
 const PORT = process.env.PORT || 3000;
 
 async function start() {
-  // Đảm bảo thư mục uploads tồn tại
-  const uploadsDir = path.join(__dirname, 'public', 'uploads');
+
+  const uploadsDir = process.env.UPLOAD_DIR || path.join(__dirname, 'public', 'uploads');
   if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
     console.log(`Created uploads directory at ${uploadsDir}`);

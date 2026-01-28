@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 set -e
 
 echo "=================================================="
@@ -38,47 +39,46 @@ pm2 -v
 # Install MongoDB
 echo "Installing MongoDB..."
 curl -fsSL https://pgp.mongodb.com/server-7.0.asc \
-  | sudo gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor
+| sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-7.0.gpg
 
-echo "deb [ arch=amd64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] \
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg] \
 https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/7.0 multiverse" \
 | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
 
 sudo apt update -y
 sudo apt install -y mongodb-org
 
-sudo systemctl stop mongod
-sudo systemctl disable mongod
+sudo systemctl stop mongod || true
+sudo systemctl disable mongod || true
 
-echo "[INFO] MongoDB installed but NOT active. It required to be started manually or via systemctl."
+echo "[INFO] MongoDB installed but NOT active."
 
 # Install Reverse Proxy Nginx
 echo "Installing Nginx reverse proxy..."
 sudo apt install -y nginx
 
-# Disable default Nginx service
-sudo systemctl stop nginx
-sudo systemctl disable nginx
+sudo systemctl stop nginx || true
+sudo systemctl disable nginx || true
 
-echo "[INFO] Nginx installed but NOT active. It required to be configured first and then enabled."
+echo "[INFO] Nginx installed but NOT active."
 
 # Install HTTPS certificate tool - Caddy
 echo "Installing Caddy..."
 sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https
 
 curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' \
-  | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+| sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
 
 curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' \
-  | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+| sudo tee /etc/apt/sources.list.d/caddy-stable.list
 
 sudo apt update -y
 sudo apt install -y caddy
 
-sudo systemctl stop caddy
-sudo systemctl disable caddy
+sudo systemctl stop caddy || true
+sudo systemctl disable caddy || true
 
-echo "[INFO] Caddy installed but NOT active. It required to be configured first and then enabled."
+echo "[INFO] Caddy installed but NOT active."
 echo "[INFO] Nginx and Caddy cannot be active at the same time."
 
 # Create application directories
@@ -87,7 +87,7 @@ echo "Creating application directories..."
 APP_BASE="/opt/app"
 
 sudo mkdir -p \
-  $APP_BASE/uploads \
+  $APP_BASE/uploads
 
 sudo chown -R $USER:$USER $APP_BASE
 
