@@ -1,5 +1,6 @@
 volumes:
   mongo_data:
+  uploads_data:
 
 services:
   app:
@@ -10,8 +11,8 @@ services:
     env_file:
       - ../.env
     volumes:
-      - type: bind
-        source: /opt/app/uploads
+      - type: volume
+        source: uploads_data
         target: /app/uploads
     depends_on:
       mongo:
