@@ -16,8 +16,6 @@ app.use(express.urlencoded({ extended: true }));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
-const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, 'public', 'uploads');
-app.use('/uploads', express.static(UPLOAD_DIR));
 
 app.use('/', uiRoutes);
 app.use('/products', productRoutes);
@@ -25,10 +23,11 @@ app.use('/products', productRoutes);
 const PORT = process.env.PORT || 3000;
 
 async function start() {
-  // Đảm bảo thư mục uploads tồn tại
-  if (!fs.existsSync(UPLOAD_DIR)) {
-    fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-    console.log(`Created uploads directory at ${UPLOAD_DIR}`);
+
+  const uploadsDir = process.env.UPLOAD_DIR || path.join(__dirname, 'public', 'uploads');
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+    console.log(`Created uploads directory at ${uploadsDir}`);
   }
 
   // Try to connect to MongoDB once with 3s timeout
