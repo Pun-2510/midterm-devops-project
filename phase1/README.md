@@ -121,7 +121,6 @@ The application is deployed directly on an Ubuntu server without containerizatio
 ```bash
 git clone https://github.com/Pun-2510/midterm-devops-project.git devops
 cd devops
-git checkout feature/phase1
 ```
 
 2. Create environment file
@@ -145,11 +144,15 @@ cd phase1/scripts
 4. Install dependencies
 
 ```bash
-cd ../../
+cd /opt/app/
+git clone https://github.com/Pun-2510/midterm-devops-project.git devops
+cd devops
+cp phase1/.env.example .env
+cat .env
 npm install
 ```
 
-If missing module:
+If missing module: (If error occured)
 
 ```bash
 npm install dotenv
@@ -169,13 +172,12 @@ This phase introduces HTTPS, reverse proxy, and PM2.
 
 > Phase 2 must be executed after Phase 1.
 
-1. Clone Phase 2 branch
+1. Clone Project from Github (Only do this step when you haven't done Phase 1)
 
 ```bash
 cd /opt/app
 git clone https://github.com/Pun-2510/midterm-devops-project.git devops
 cd devops
-git checkout feature/phase2
 npm install
 ```
 
@@ -184,6 +186,11 @@ npm install
 ```bash
 sudo systemctl start mongod
 sudo systemctl enable mongod
+```
+
+Check the status of MongoDB (To check if it has started yet)
+```bash
+sudo systemctl status mongod
 ```
 
 3. Create `.env`
@@ -202,6 +209,8 @@ pm2 save
 pm2 startup
 ```
 
+Access the website with url: http://PUBLIC_IP_OR_DOMAIN_NAME:3000
+
 5. Configure Nginx
 
 ```bash
@@ -211,7 +220,7 @@ sudo nano /etc/nginx/sites-available/devops-app
 ```nginx
 server {
     listen 80;
-    server_name yourdomain.com or public ip;
+    server_name public ip;
 
     location / {
         proxy_pass http://localhost:3000;
@@ -230,7 +239,33 @@ sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-6. Switch to Caddy for HTTPS
+6. Configure DNS with Nginx
+
+```bash
+sudo nano /etc/nginx/sites-available/devops-app
+```
+
+```nginx
+server {
+    listen 80;
+    server_name yourdomain.com www.youdomain.com;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $remote_addr;
+    }
+}
+```
+
+```bash
+sudo nginx -t
+sudo systemctl reload nginx
+sudo systemctl restart nginx
+sudo nginx -t
+```
+
+7. Switch to Caddy for HTTPS
 
 ```bash
 sudo systemctl stop nginx
@@ -249,7 +284,6 @@ yourdomain.com {
 ```
 
 ```bash
-sudo caddy validate
 sudo systemctl reload caddy
 journalctl -u caddy -f
 ```
@@ -258,3 +292,125 @@ journalctl -u caddy -f
 
 ## 7.3 Phase 3 – Containerized Deployment
 
+1. Stop and disable all the service
+
+```bash
+pm2 stop all
+pm2 delete all
+pm2 kill
+pm2 unstartup
+pm2 ls
+ps aux | grep pm2
+```
+
+```bash
+sudo systemctl stop mongod
+sudo systemctl disable mongod
+sudo systemctl status mongod
+```
+
+```bash
+sudo systemctl stop caddy
+sudo systemctl disable caddy
+sudo systemctl status caddy
+```
+
+```bash
+sudo ss -tulpn | grep -E ':(80|443)'
+```
+
+2. Install Docker and Docker Compose
+
+```bash
+sudo apt update
+
+sudo install -m 0755 -d /etc/apt/keyrings
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
+  | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+```
+
+```bash
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+  https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" \
+  | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+```
+
+```bash
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+
+```bash
+docker --version
+docker compose version
+```
+
+```bash
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+3. Create .env for phase 3
+
+```bash
+cp phase3/.env.example .env
+nano .env
+```
+
+4. Build images
+
+> **Note:**  
+> The image name must follow the format `username/repository:tag`.  
+> `pun0205` is **only an example Docker Hub account** used in this project.  
+> Please replace it with **your own Docker Hub username** before building  
+> and pushing the image.
+
+```bash
+docker build -t pun0205/midterm-devops-app:phase3 -f phase3/Dockerfile .
+docker images
+```
+
+5. Login into account
+
+> **Note:**  
+> After executing the command below, Docker will prompt you with:
+>
+> To sign in with your Docker Hub account, open the following URL in your browser:
+>
+> ```text
+> https://login.docker.com/activate
+> ```
+>
+> And provide a one-time code, for example:
+>
+> ```text
+> ABCD-EFGH
+> ```
+>
+> *(The code above is for demonstration purposes only.)*
+
+```bash
+docker login
+```
+
+6. Push images into Docker Hub
+
+> **Note:**  
+> Replace `pun0205` with your own Docker Hub username.  
+> Format: `<username>/<repository>:<tag>`
+
+```bash
+docker push pun0205/midterm-devops-app:phase3
+```
+
+7. Run Docker Compose
+
+```bash
+cd phase3
+docker compose up -d
+```
