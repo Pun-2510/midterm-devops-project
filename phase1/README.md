@@ -414,3 +414,43 @@ docker push pun0205/midterm-devops-app:phase3
 cd phase3
 docker compose up -d
 ```
+
+# VIII. Automation Script
+
+## 7.1 Purpose
+The setup.sh script is designed to automatically prepare a clean Ubuntu environment for deploying the project.
+It installs all required system dependencies, development tools, and services without starting any application or service by default, ensuring compatibility with a Docker-based deployment workflow.
+
+## 7.2 Script Behavior Overview
+
+### 1. System Update
+- Updates the package list and upgrades all existing packages to their latest versions.
+- Ensures the system is up-to-date and secure before installing new components.
+
+### 2. Install Essential OS Packages
+- Installs commonly required tools
+
+### 3. Install Node.js (v20 LTS) and npm
+- Installs Node.js 20 (LTS) from the official NodeSource repository.
+- Automatically installs npm alongside Node.js.
+- Verifies the installation by printing installed versions.
+
+### 4. Install PM2 (Process Manager)
+- Installs PM2 globally using npm.
+- PM2 is included for development or legacy usage.
+- PM2 is not configured to start any application automatically.
+
+### 5. Install MongoDB (Disabled by Default)
+- Installs MongoDB 7.0 from the official MongoDB repository.
+- Immediately stops and disables the mongod service.
+- MongoDB is installed only as a dependency, not as an active service.
+- Prevents port conflicts with MongoDB running inside Docker containers.
+
+### 6. Install Reverse Proxy Services (Disabled)
+- Installs Nginx and Caddy.
+
+### 7. Create Application Directories
+- Creates the directory:
+```text
+/opt/app/uploads
+```
