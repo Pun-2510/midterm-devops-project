@@ -14,7 +14,73 @@ Through these deployments, the project demonstrates professional practices in Gi
 
 ---
 
-# III. Technology Stack
+# III. Architecture
+
+## 3.1 Components
+
+- **Client:** Web Browser  
+  - Sends HTTP requests and renders responses (HTML/CSS/JS).
+
+- **Backend:** Node.js + Express  
+  - Main application server located in the `src/` directory.
+  - Handles routing, business logic, and responses.
+
+- **Static Views / Templates:**  
+  - Server-side rendered views (e.g., EJS templates) used to generate HTML pages.
+
+- **DevOps Phases:**
+  - **Phase 1:** Basic project setup and local build environment.
+  - **Phase 2:** CI/CD configuration and automation (e.g., build and test pipeline).
+  - **Phase 3:** Deployment and containerization.
+
+- **Reverse Proxy (Phase 2 – optional):**  
+  - Nginx or Caddy used to forward client requests to the backend service.
+
+- **Containerization (Phase 3):**  
+  - Docker and Docker Compose used to package and deploy the application.
+
+---
+
+## 3.2 Request Flow
+
+1. The user sends a request from a web browser.
+2. The request reaches the reverse proxy (Nginx/Caddy) if configured.
+3. The reverse proxy forwards the request to the Node.js + Express backend.
+4. The backend processes the request, executes business logic, and interacts with the database if needed.
+5. The backend returns an HTML page or JSON response.
+6. The browser displays the response to the user.
+
+---
+
+## 3.3 Architecture Diagram 
+
+[Browser Client]
+        |
+        v
+[Nginx / Caddy]
+        |
+        v
+[Node.js + Express]
+        |
+        v
+[Database (MongoDB)]
+
+DevOps Pipeline:
+Phase 1 → Phase 2 → Phase 3
+Build → CI/CD → Deployment
+
+---
+
+## 3.4 Summary
+
+- The system follows a **client–server architecture**.
+- DevOps practices are applied incrementally through multiple phases.
+- CI/CD automates build and deployment processes.
+- Docker ensures consistent and portable deployment across environments.
+
+---
+
+# IV. Technology Stack
 The project utilizes the following core technologies:
 - **Operating System:** Ubuntu (Cloud Server)
 - **Backend Runtime:** Node.js (LTS)
@@ -28,7 +94,7 @@ The project utilizes the following core technologies:
 
 ---
 
-# IV. Repository Structure
+# V. Repository Structure
 
 The repository is organized according to a phase-based structure, ensuring clarity, separation of concerns, and alignment with the project specification:
 
@@ -70,7 +136,7 @@ The repository is organized according to a phase-based structure, ensuring clari
 
 ---
 
-# V. Local Development Setup
+# VI. Local Development Setup
 
 ## Prerequisites
 
@@ -84,7 +150,7 @@ The repository is organized according to a phase-based structure, ensuring clari
 
 ---
 
-# VI. Environment Variables Management
+# VII. Environment Variables Management
 
 ## 6.1 Purpose
 
@@ -108,7 +174,7 @@ Each deployment phase maintains its own `.env.example` file:
 
 ---
 
-# VII. Deployment Phases
+# VIII. Deployment Phases
 
 ## 7.1 Phase 1 – Traditional Deployment
 
@@ -415,7 +481,7 @@ cd phase3
 docker compose up -d
 ```
 
-# VIII. Automation Script
+# IX. Automation Script
 
 ## 7.1 Purpose
 The setup.sh script is designed to automatically prepare a clean Ubuntu environment for deploying the project.
@@ -454,3 +520,12 @@ It installs all required system dependencies, development tools, and services wi
 ```text
 /opt/app/uploads
 ```
+---
+
+# X. Deployment Notes
+
+- All services (MongoDB, Nginx, Caddy) are installed but disabled by default in Phase 1.
+- Ensure `.env` file is created from the correct phase template before running.
+- Ports 80/443 must be free before enabling reverse proxy or HTTPS.
+- Use Docker in Phase 3; stop PM2, MongoDB, and Caddy to avoid conflicts.
+- Always verify domain DNS before requesting HTTPS certificates.
