@@ -8,8 +8,8 @@ services:
   app:
     image: pun0205/midterm-devops-app:phase3
     container_name: app
-    expose:
-      - "3000"
+    ports:
+      - "3000:3000"
     env_file:
       - ../.env
     volumes:
@@ -17,8 +17,7 @@ services:
         source: uploads_data
         target: /app/uploads
     depends_on:
-      mongo:
-        condition: service_healthy
+      - mongo
     restart: unless-stopped
 
   mongo:
@@ -28,11 +27,6 @@ services:
       - type: volume
         source: mongo_data
         target: /data/db
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     restart: unless-stopped
 
   caddy:
